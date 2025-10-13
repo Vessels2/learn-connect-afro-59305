@@ -20,6 +20,7 @@ import { AnnouncementsSection } from "@/components/AnnouncementsSection";
 import { TeacherDashboard } from "@/components/teacher/TeacherDashboard";
 import { CourseBrowser } from "@/components/student/CourseBrowser";
 import { StudentAssignments } from "@/components/student/StudentAssignments";
+import { StudentAnalytics } from "@/components/analytics/StudentAnalytics";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -189,6 +190,7 @@ export default function Dashboard() {
 
             {/* Main Content */}
             <div className="space-y-6">
+              <StudentAnalytics studentId={user.id} />
               <CourseBrowser studentId={user.id} />
               <StudentAssignments studentId={user.id} />
             </div>

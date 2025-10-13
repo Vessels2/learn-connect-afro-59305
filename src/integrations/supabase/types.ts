@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_logs: {
+        Row: {
+          activity_type: string
+          assignment_id: string | null
+          course_id: string | null
+          created_at: string | null
+          duration_minutes: number | null
+          id: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          assignment_id?: string | null
+          course_id?: string | null
+          created_at?: string | null
+          duration_minutes?: number | null
+          id?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          assignment_id?: string | null
+          course_id?: string | null
+          created_at?: string | null
+          duration_minutes?: number | null
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_logs_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "assignments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_logs_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       announcements: {
         Row: {
           author_id: string
@@ -321,26 +369,35 @@ export type Database = {
       student_progress: {
         Row: {
           completed_lessons: number | null
+          completion_rate: number | null
           course_id: string
           id: string
           last_accessed: string | null
+          skills_data: Json | null
           student_id: string
+          time_spent_minutes: number | null
           total_lessons: number | null
         }
         Insert: {
           completed_lessons?: number | null
+          completion_rate?: number | null
           course_id: string
           id?: string
           last_accessed?: string | null
+          skills_data?: Json | null
           student_id: string
+          time_spent_minutes?: number | null
           total_lessons?: number | null
         }
         Update: {
           completed_lessons?: number | null
+          completion_rate?: number | null
           course_id?: string
           id?: string
           last_accessed?: string | null
+          skills_data?: Json | null
           student_id?: string
+          time_spent_minutes?: number | null
           total_lessons?: number | null
         }
         Relationships: [
