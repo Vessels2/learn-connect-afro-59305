@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          icon: string
+          id: string
+          name: string
+          points_reward: number
+          requirement_type: string
+          requirement_value: number
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          icon: string
+          id?: string
+          name: string
+          points_reward?: number
+          requirement_type: string
+          requirement_value: number
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          icon?: string
+          id?: string
+          name?: string
+          points_reward?: number
+          requirement_type?: string
+          requirement_value?: number
+        }
+        Relationships: []
+      }
       activity_logs: {
         Row: {
           activity_type: string
@@ -153,6 +186,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      badges: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string | null
+          icon: string
+          id: string
+          name: string
+          points_required: number
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          description?: string | null
+          icon: string
+          id?: string
+          name: string
+          points_required?: number
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          icon?: string
+          id?: string
+          name?: string
+          points_required?: number
+        }
+        Relationships: []
       }
       courses: {
         Row: {
@@ -366,13 +429,79 @@ export type Database = {
         }
         Relationships: []
       }
+      student_achievements: {
+        Row: {
+          achievement_id: string
+          id: string
+          progress: number | null
+          student_id: string
+          unlocked_at: string | null
+        }
+        Insert: {
+          achievement_id: string
+          id?: string
+          progress?: number | null
+          student_id: string
+          unlocked_at?: string | null
+        }
+        Update: {
+          achievement_id?: string
+          id?: string
+          progress?: number | null
+          student_id?: string
+          unlocked_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_badges: {
+        Row: {
+          badge_id: string
+          earned_at: string | null
+          id: string
+          student_id: string
+        }
+        Insert: {
+          badge_id: string
+          earned_at?: string | null
+          id?: string
+          student_id: string
+        }
+        Update: {
+          badge_id?: string
+          earned_at?: string | null
+          id?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       student_progress: {
         Row: {
           completed_lessons: number | null
           completion_rate: number | null
           course_id: string
+          current_streak: number | null
           id: string
           last_accessed: string | null
+          last_activity_date: string | null
+          level: number | null
+          longest_streak: number | null
+          points: number | null
           skills_data: Json | null
           student_id: string
           time_spent_minutes: number | null
@@ -382,8 +511,13 @@ export type Database = {
           completed_lessons?: number | null
           completion_rate?: number | null
           course_id: string
+          current_streak?: number | null
           id?: string
           last_accessed?: string | null
+          last_activity_date?: string | null
+          level?: number | null
+          longest_streak?: number | null
+          points?: number | null
           skills_data?: Json | null
           student_id: string
           time_spent_minutes?: number | null
@@ -393,8 +527,13 @@ export type Database = {
           completed_lessons?: number | null
           completion_rate?: number | null
           course_id?: string
+          current_streak?: number | null
           id?: string
           last_accessed?: string | null
+          last_activity_date?: string | null
+          level?: number | null
+          longest_streak?: number | null
+          points?: number | null
           skills_data?: Json | null
           student_id?: string
           time_spent_minutes?: number | null
@@ -413,6 +552,35 @@ export type Database = {
             columns: ["student_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_unlocks: {
+        Row: {
+          content_id: string
+          id: string
+          student_id: string
+          unlocked_at: string | null
+        }
+        Insert: {
+          content_id: string
+          id?: string
+          student_id: string
+          unlocked_at?: string | null
+        }
+        Update: {
+          content_id?: string
+          id?: string
+          student_id?: string
+          unlocked_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_unlocks_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "unlockable_content"
             referencedColumns: ["id"]
           },
         ]
@@ -518,11 +686,48 @@ export type Database = {
           },
         ]
       }
+      unlockable_content: {
+        Row: {
+          content_data: Json | null
+          content_type: string
+          created_at: string | null
+          description: string | null
+          id: string
+          level_required: number
+          points_required: number
+          title: string
+        }
+        Insert: {
+          content_data?: Json | null
+          content_type: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          level_required?: number
+          points_required?: number
+          title: string
+        }
+        Update: {
+          content_data?: Json | null
+          content_type?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          level_required?: number
+          points_required?: number
+          title?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      award_points: {
+        Args: { _course_id: string; _points: number; _student_id: string }
+        Returns: Json
+      }
       delete_old_assignments: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -530,6 +735,10 @@ export type Database = {
       get_user_role: {
         Args: { user_id: string }
         Returns: Database["public"]["Enums"]["user_role"]
+      }
+      update_streak: {
+        Args: { _course_id: string; _student_id: string }
+        Returns: undefined
       }
     }
     Enums: {

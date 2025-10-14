@@ -21,6 +21,114 @@ import { TeacherDashboard } from "@/components/teacher/TeacherDashboard";
 import { CourseBrowser } from "@/components/student/CourseBrowser";
 import { StudentAssignments } from "@/components/student/StudentAssignments";
 import { StudentAnalytics } from "@/components/analytics/StudentAnalytics";
+import { GamificationHeader } from "@/components/gamification/GamificationHeader";
+import { BadgeCollection } from "@/components/gamification/BadgeCollection";
+import { Leaderboard } from "@/components/gamification/Leaderboard";
+import { AchievementTracker } from "@/components/gamification/AchievementTracker";
+import { UnlockableContent } from "@/components/gamification/UnlockableContent";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useQuery } from "@tanstack/react-query";
+
+function StudentDashboardContent({ userId }: { userId: string }) {
+  const { data: progress } = useQuery({
+    queryKey: ["student-progress-overview", userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("student_progress")
+        .select("*")
+        .eq("student_id", userId)
+        .single();
+
+      if (error && error.code !== "PGRST116") throw error;
+      return data || {
+        points: 0,
+        level: 1,
+        current_streak: 0,
+        longest_streak: 0
+      };
+    },
+  });
+
+  return (
+    <>
+      {/* Gamification Header */}
+      <GamificationHeader
+        points={progress?.points || 0}
+        level={progress?.level || 1}
+        currentStreak={progress?.current_streak || 0}
+        longestStreak={progress?.longest_streak || 0}
+      />
+
+      {/* Tabs for different sections */}
+      <Tabs defaultValue="courses" className="w-full">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="courses">Courses</TabsTrigger>
+          <TabsTrigger value="assignments">Assignments</TabsTrigger>
+          <TabsTrigger value="badges">Badges</TabsTrigger>
+          <TabsTrigger value="achievements">Achievements</TabsTrigger>
+          <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="courses" className="space-y-6 mt-6">
+          <StudentAnalytics studentId={userId} />
+          <CourseBrowser studentId={userId} />
+        </TabsContent>
+
+        <TabsContent value="assignments" className="mt-6">
+          <StudentAssignments studentId={userId} />
+        </TabsContent>
+
+        <TabsContent value="badges" className="mt-6">
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-2xl font-bold mb-2">Badge Collection</h3>
+              <p className="text-muted-foreground mb-6">
+                Earn badges by completing assignments, maintaining streaks, and reaching milestones
+              </p>
+            </div>
+            <BadgeCollection userId={userId} />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="achievements" className="mt-6">
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-2xl font-bold mb-2">Achievements</h3>
+              <p className="text-muted-foreground mb-6">
+                Track your progress and unlock rewards
+              </p>
+            </div>
+            <AchievementTracker userId={userId} />
+
+            <div className="mt-12">
+              <h3 className="text-2xl font-bold mb-2">Unlockable Content</h3>
+              <p className="text-muted-foreground mb-6">
+                Unlock special content by leveling up and earning points
+              </p>
+              <UnlockableContent
+                userId={userId}
+                userLevel={progress?.level || 1}
+                userPoints={progress?.points || 0}
+              />
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="leaderboard" className="mt-6">
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-2xl font-bold mb-2">Leaderboard</h3>
+              <p className="text-muted-foreground mb-6">
+                See how you rank against other students
+              </p>
+            </div>
+            <Leaderboard />
+          </div>
+        </TabsContent>
+      </Tabs>
+    </>
+  );
+}
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -140,61 +248,7 @@ export default function Dashboard() {
           /* Teacher Dashboard */
           <TeacherDashboard teacherId={user.id} />
         ) : (
-          <>
-            {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Courses</CardTitle>
-                  <BookOpen className="h-4 w-4 text-primary" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">0</div>
-                  <p className="text-xs text-muted-foreground">Enrolled</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Progress</CardTitle>
-                  <TrendingUp className="h-4 w-4 text-secondary" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">0%</div>
-                  <p className="text-xs text-muted-foreground">Overall completion</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Assignments</CardTitle>
-                  <Users className="h-4 w-4 text-accent" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">0</div>
-                  <p className="text-xs text-muted-foreground">Pending</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Achievements</CardTitle>
-                  <Award className="h-4 w-4 text-yellow-500" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">0</div>
-                  <p className="text-xs text-muted-foreground">Earned</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Main Content */}
-            <div className="space-y-6">
-              <StudentAnalytics studentId={user.id} />
-              <CourseBrowser studentId={user.id} />
-              <StudentAssignments studentId={user.id} />
-            </div>
-          </>
+          <StudentDashboardContent userId={user.id} />
         )}
       </main>
 
