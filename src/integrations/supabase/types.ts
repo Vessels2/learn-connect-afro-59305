@@ -133,6 +133,302 @@ export type Database = {
           },
         ]
       }
+      assessment_answers: {
+        Row: {
+          answer_text: string | null
+          auto_graded: boolean | null
+          code_answer: string | null
+          created_at: string | null
+          id: string
+          is_correct: boolean | null
+          points_earned: number | null
+          question_id: string
+          selected_option_id: string | null
+          submission_id: string
+        }
+        Insert: {
+          answer_text?: string | null
+          auto_graded?: boolean | null
+          code_answer?: string | null
+          created_at?: string | null
+          id?: string
+          is_correct?: boolean | null
+          points_earned?: number | null
+          question_id: string
+          selected_option_id?: string | null
+          submission_id: string
+        }
+        Update: {
+          answer_text?: string | null
+          auto_graded?: boolean | null
+          code_answer?: string | null
+          created_at?: string | null
+          id?: string
+          is_correct?: boolean | null
+          points_earned?: number | null
+          question_id?: string
+          selected_option_id?: string | null
+          submission_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessment_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assessment_answers_selected_option_id_fkey"
+            columns: ["selected_option_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_options"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assessment_answers_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assessment_options: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_correct: boolean
+          option_text: string
+          order_index: number
+          question_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_correct?: boolean
+          option_text: string
+          order_index: number
+          question_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_correct?: boolean
+          option_text?: string
+          order_index?: number
+          question_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessment_options_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assessment_questions: {
+        Row: {
+          assessment_id: string
+          code_template: string | null
+          created_at: string | null
+          id: string
+          order_index: number
+          points: number
+          question_text: string
+          question_type: Database["public"]["Enums"]["question_type"]
+          test_cases: Json | null
+        }
+        Insert: {
+          assessment_id: string
+          code_template?: string | null
+          created_at?: string | null
+          id?: string
+          order_index: number
+          points?: number
+          question_text: string
+          question_type: Database["public"]["Enums"]["question_type"]
+          test_cases?: Json | null
+        }
+        Update: {
+          assessment_id?: string
+          code_template?: string | null
+          created_at?: string | null
+          id?: string
+          order_index?: number
+          points?: number
+          question_text?: string
+          question_type?: Database["public"]["Enums"]["question_type"]
+          test_cases?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessment_questions_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assessment_rubrics: {
+        Row: {
+          assessment_id: string
+          id: string
+          rubric_id: string
+        }
+        Insert: {
+          assessment_id: string
+          id?: string
+          rubric_id: string
+        }
+        Update: {
+          assessment_id?: string
+          id?: string
+          rubric_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessment_rubrics_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assessment_rubrics_rubric_id_fkey"
+            columns: ["rubric_id"]
+            isOneToOne: false
+            referencedRelation: "rubrics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assessment_submissions: {
+        Row: {
+          assessment_id: string
+          auto_graded_score: number | null
+          feedback: string | null
+          id: string
+          is_practice: boolean | null
+          manual_score: number | null
+          score: number | null
+          started_at: string | null
+          student_id: string
+          submitted_at: string | null
+          time_taken_minutes: number | null
+        }
+        Insert: {
+          assessment_id: string
+          auto_graded_score?: number | null
+          feedback?: string | null
+          id?: string
+          is_practice?: boolean | null
+          manual_score?: number | null
+          score?: number | null
+          started_at?: string | null
+          student_id: string
+          submitted_at?: string | null
+          time_taken_minutes?: number | null
+        }
+        Update: {
+          assessment_id?: string
+          auto_graded_score?: number | null
+          feedback?: string | null
+          id?: string
+          is_practice?: boolean | null
+          manual_score?: number | null
+          score?: number | null
+          started_at?: string | null
+          student_id?: string
+          submitted_at?: string | null
+          time_taken_minutes?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessment_submissions_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assessment_submissions_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assessments: {
+        Row: {
+          allow_peer_review: boolean | null
+          assessment_type: Database["public"]["Enums"]["assessment_type"]
+          course_id: string
+          created_at: string | null
+          description: string | null
+          due_date: string | null
+          id: string
+          is_published: boolean | null
+          max_score: number | null
+          peer_review_required: number | null
+          teacher_id: string
+          time_limit_minutes: number | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          allow_peer_review?: boolean | null
+          assessment_type: Database["public"]["Enums"]["assessment_type"]
+          course_id: string
+          created_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          is_published?: boolean | null
+          max_score?: number | null
+          peer_review_required?: number | null
+          teacher_id: string
+          time_limit_minutes?: number | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          allow_peer_review?: boolean | null
+          assessment_type?: Database["public"]["Enums"]["assessment_type"]
+          course_id?: string
+          created_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          is_published?: boolean | null
+          max_score?: number | null
+          peer_review_required?: number | null
+          teacher_id?: string
+          time_limit_minutes?: number | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessments_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assessments_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       assignments: {
         Row: {
           auto_delete_at: string | null
@@ -351,6 +647,54 @@ export type Database = {
           },
         ]
       }
+      peer_reviews: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          feedback: string | null
+          id: string
+          reviewer_id: string
+          rubric_scores: Json | null
+          score: number | null
+          submission_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          feedback?: string | null
+          id?: string
+          reviewer_id: string
+          rubric_scores?: Json | null
+          score?: number | null
+          submission_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          feedback?: string | null
+          id?: string
+          reviewer_id?: string
+          rubric_scores?: Json | null
+          score?: number | null
+          submission_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "peer_reviews_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "peer_reviews_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -392,6 +736,76 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      rubric_criteria: {
+        Row: {
+          created_at: string | null
+          criterion_name: string
+          description: string | null
+          id: string
+          max_points: number
+          order_index: number
+          rubric_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          criterion_name: string
+          description?: string | null
+          id?: string
+          max_points: number
+          order_index: number
+          rubric_id: string
+        }
+        Update: {
+          created_at?: string | null
+          criterion_name?: string
+          description?: string | null
+          id?: string
+          max_points?: number
+          order_index?: number
+          rubric_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rubric_criteria_rubric_id_fkey"
+            columns: ["rubric_id"]
+            isOneToOne: false
+            referencedRelation: "rubrics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rubrics: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          teacher_id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          teacher_id: string
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          teacher_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rubrics_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sdg_content: {
         Row: {
@@ -724,6 +1138,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      auto_grade_submission: {
+        Args: { p_submission_id: string }
+        Returns: undefined
+      }
       award_points: {
         Args: { _course_id: string; _points: number; _student_id: string }
         Returns: Json
@@ -742,8 +1160,14 @@ export type Database = {
       }
     }
     Enums: {
+      assessment_type: "quiz" | "code_challenge" | "practice" | "graded"
       grade_level: "primary" | "secondary" | "university"
       language_code: "en" | "ha" | "ig" | "yo" | "pcm"
+      question_type:
+        | "multiple_choice"
+        | "code_challenge"
+        | "short_answer"
+        | "essay"
       user_role: "student" | "teacher" | "admin"
     }
     CompositeTypes: {
@@ -872,8 +1296,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      assessment_type: ["quiz", "code_challenge", "practice", "graded"],
       grade_level: ["primary", "secondary", "university"],
       language_code: ["en", "ha", "ig", "yo", "pcm"],
+      question_type: [
+        "multiple_choice",
+        "code_challenge",
+        "short_answer",
+        "essay",
+      ],
       user_role: ["student", "teacher", "admin"],
     },
   },
