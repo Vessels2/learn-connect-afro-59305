@@ -5,13 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { User, Save, Github, Twitter, Facebook } from "lucide-react";
+import { User, Save, Github, Twitter, Facebook, ExternalLink } from "lucide-react";
 import { Label } from "@/components/ui/label";
 
 export function TeacherProfile({ teacherId }: { teacherId: string }) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
+  const [teacherName, setTeacherName] = useState<string>("");
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     bio: "",
     qualifications: "",
@@ -24,28 +26,47 @@ export function TeacherProfile({ teacherId }: { teacherId: string }) {
 
   useEffect(() => {
     loadProfile();
+    getCurrentUser();
   }, [teacherId]);
+
+  const getCurrentUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setCurrentUserId(user?.id || null);
+  };
 
   const loadProfile = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: profileData, error: profileError } = await supabase
         .from("teacher_profiles")
         .select("*")
         .eq("user_id", teacherId)
         .maybeSingle();
 
-      if (error && error.code !== "PGRST116") throw error;
+      if (profileError && profileError.code !== "PGRST116") throw profileError;
 
-      if (data) {
-        setProfile(data);
+      // Also fetch the teacher's name from profiles
+      const { data: userData, error: userError } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", teacherId)
+        .single();
+
+      if (userError) throw userError;
+
+      if (userData) {
+        setTeacherName(userData.full_name);
+      }
+
+      if (profileData) {
+        setProfile(profileData);
         setFormData({
-          bio: data.bio || "",
-          qualifications: data.qualifications || "",
-          rank: data.rank || "",
-          github_link: data.github_link || "",
-          twitter_link: data.twitter_link || "",
-          facebook_link: data.facebook_link || "",
-          other_links: data.other_links || [],
+          bio: profileData.bio || "",
+          qualifications: profileData.qualifications || "",
+          rank: profileData.rank || "",
+          github_link: profileData.github_link || "",
+          twitter_link: profileData.twitter_link || "",
+          facebook_link: profileData.facebook_link || "",
+          other_links: profileData.other_links || [],
         });
       }
     } catch (error: any) {
@@ -100,12 +121,101 @@ export function TeacherProfile({ teacherId }: { teacherId: string }) {
     return <div className="text-center py-8">Loading profile...</div>;
   }
 
+  const isOwner = currentUserId === teacherId;
+
+  // Read-only view for students and non-owners
+  if (!isOwner) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <User className="h-5 w-5 text-primary" />
+            {teacherName}'s Profile
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {formData.rank && (
+            <div>
+              <h3 className="font-semibold text-sm text-muted-foreground mb-2">Academic Rank</h3>
+              <p className="text-foreground">{formData.rank}</p>
+            </div>
+          )}
+
+          {formData.qualifications && (
+            <div>
+              <h3 className="font-semibold text-sm text-muted-foreground mb-2">Qualifications</h3>
+              <p className="text-foreground whitespace-pre-wrap">{formData.qualifications}</p>
+            </div>
+          )}
+
+          {formData.bio && (
+            <div>
+              <h3 className="font-semibold text-sm text-muted-foreground mb-2">About</h3>
+              <p className="text-foreground whitespace-pre-wrap">{formData.bio}</p>
+            </div>
+          )}
+
+          {(formData.github_link || formData.twitter_link || formData.facebook_link) && (
+            <div>
+              <h3 className="font-semibold text-sm text-muted-foreground mb-3">Connect</h3>
+              <div className="flex flex-wrap gap-2">
+                {formData.github_link && (
+                  <a
+                    href={formData.github_link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-md border hover:bg-accent transition-colors"
+                  >
+                    <Github className="h-4 w-4" />
+                    <span className="text-sm">GitHub</span>
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                )}
+                {formData.twitter_link && (
+                  <a
+                    href={formData.twitter_link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-md border hover:bg-accent transition-colors"
+                  >
+                    <Twitter className="h-4 w-4" />
+                    <span className="text-sm">X</span>
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                )}
+                {formData.facebook_link && (
+                  <a
+                    href={formData.facebook_link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-md border hover:bg-accent transition-colors"
+                  >
+                    <Facebook className="h-4 w-4" />
+                    <span className="text-sm">Facebook</span>
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
+
+          {!profile && (
+            <p className="text-muted-foreground text-center py-4">
+              This teacher hasn't set up their profile yet.
+            </p>
+          )}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Editable view for the teacher (owner)
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <User className="h-5 w-5 text-primary" />
-          Teacher Profile
+          My Teacher Profile
         </CardTitle>
       </CardHeader>
       <CardContent>
