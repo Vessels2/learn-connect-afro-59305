@@ -5,10 +5,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { FileText, ExternalLink, CheckCircle, Clock } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { formatDistanceToNow } from "date-fns";
+
+const getLetterGrade = (score: number): string => {
+  if (score >= 70) return "A";
+  if (score >= 60) return "B";
+  if (score >= 50) return "C";
+  if (score >= 40) return "D";
+  return "F";
+};
 
 export function StudentAssignments({ studentId }: { studentId: string }) {
   const { toast } = useToast();
@@ -169,14 +178,26 @@ export function StudentAssignments({ studentId }: { studentId: string }) {
                         </a>
                       )}
                       {isSubmitted && (
-                        <div className="mt-2 p-2 bg-primary/5 rounded text-sm">
+                        <div className="mt-3 space-y-2">
                           {isGraded ? (
-                            <p className="text-primary font-medium">
-                              Graded: {submission.score}/{assignment.max_score} pts
-                              {submission.feedback && <span className="block text-xs mt-1">{submission.feedback}</span>}
-                            </p>
+                            <>
+                              <div className="flex items-center gap-2">
+                                <Badge variant="secondary" className="text-base font-semibold">
+                                  {getLetterGrade(submission.score)}
+                                </Badge>
+                                <span className="text-sm text-muted-foreground">
+                                  Score: {submission.score}/{assignment.max_score} pts
+                                </span>
+                              </div>
+                              {submission.feedback && (
+                                <div className="p-3 bg-muted rounded-md text-sm">
+                                  <p className="font-medium mb-1">Teacher Feedback:</p>
+                                  <p className="text-foreground">{submission.feedback}</p>
+                                </div>
+                              )}
+                            </>
                           ) : (
-                            <p className="text-muted-foreground">Submitted - Awaiting grade</p>
+                            <p className="text-xs text-muted-foreground">Submitted - Awaiting grade</p>
                           )}
                         </div>
                       )}
