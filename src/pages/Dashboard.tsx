@@ -28,6 +28,9 @@ import { AchievementTracker } from "@/components/gamification/AchievementTracker
 import { UnlockableContent } from "@/components/gamification/UnlockableContent";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
+import { OfflineIndicator, OnlineStatusBadge } from "@/components/OfflineIndicator";
+import { InstallPrompt } from "@/components/InstallPrompt";
+import { fetchAndCacheCourses, fetchAndCacheAssignments } from "@/services/offlineSync";
 
 function StudentDashboardContent({ userId }: { userId: string }) {
   const { data: progress } = useQuery({
@@ -212,6 +215,7 @@ export default function Dashboard() {
           </div>
           
           <div className="flex items-center gap-4">
+            <OnlineStatusBadge />
             <div className="text-right hidden sm:block">
               <p className="text-sm font-medium">{profile?.full_name}</p>
               <p className="text-xs text-muted-foreground capitalize">{profile?.role}</p>
@@ -257,6 +261,10 @@ export default function Dashboard() {
         <p className="font-medium text-primary">Education in Every Pocket</p>
         <p className="text-xs mt-1">Plagiarism-free, quality content for every learner</p>
       </footer>
+
+      {/* PWA Components */}
+      <OfflineIndicator />
+      <InstallPrompt />
     </div>
   );
 }

@@ -10,6 +10,8 @@ import { useToast } from "@/hooks/use-toast";
 import { FileText, ExternalLink, CheckCircle, Clock } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { formatDistanceToNow } from "date-fns";
+import { saveSubmissionOffline } from "@/services/offlineSync";
+import { getCachedAssignments, getCachedSubmissions } from "@/services/indexedDB";
 
 const getLetterGrade = (score: number): string => {
   if (score >= 70) return "A";
