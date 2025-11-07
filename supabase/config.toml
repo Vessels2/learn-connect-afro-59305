@@ -1,1 +1,16 @@
 project_id = "xpampuxbpcrtsawewdxm"
+
+[functions.cleanup-old-assignments]
+verify_jwt = false
+
+[functions.study-recommendations]
+verify_jwt = false
+
+[functions.generate-quiz]
+verify_jwt = false
+
+[functions.essay-feedback]
+verify_jwt = false
+
+[functions.course-qa]
+verify_jwt = false

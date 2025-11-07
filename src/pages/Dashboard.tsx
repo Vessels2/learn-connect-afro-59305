@@ -21,6 +21,7 @@ import { TeacherDashboard } from "@/components/teacher/TeacherDashboard";
 import { CourseBrowser } from "@/components/student/CourseBrowser";
 import { StudentAssignments } from "@/components/student/StudentAssignments";
 import { StudentAnalytics } from "@/components/analytics/StudentAnalytics";
+import AIStudyAssistant from "@/components/student/AIStudyAssistant";
 import { GamificationHeader } from "@/components/gamification/GamificationHeader";
 import { BadgeCollection } from "@/components/gamification/BadgeCollection";
 import { Leaderboard } from "@/components/gamification/Leaderboard";
@@ -64,9 +65,10 @@ function StudentDashboardContent({ userId }: { userId: string }) {
 
       {/* Tabs for different sections */}
       <Tabs defaultValue="courses" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="courses">Courses</TabsTrigger>
           <TabsTrigger value="assignments">Assignments</TabsTrigger>
+          <TabsTrigger value="ai-assistant">AI Assistant</TabsTrigger>
           <TabsTrigger value="badges">Badges</TabsTrigger>
           <TabsTrigger value="achievements">Achievements</TabsTrigger>
           <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
@@ -79,6 +81,10 @@ function StudentDashboardContent({ userId }: { userId: string }) {
 
         <TabsContent value="assignments" className="mt-6">
           <StudentAssignments studentId={userId} />
+        </TabsContent>
+
+        <TabsContent value="ai-assistant" className="mt-6">
+          <AIStudyAssistant />
         </TabsContent>
 
         <TabsContent value="badges" className="mt-6">
